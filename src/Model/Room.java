@@ -1,5 +1,7 @@
 package Model;
 
+import java.util.Vector;
+
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -33,4 +35,9 @@ public class Room {
 		}
 		
 	}
+	
+	public void buyRoom() {
+		
+	}
+	
 }

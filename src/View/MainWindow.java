@@ -2,11 +2,12 @@ package View;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
-import Model.Money;
+import Model.*;
 import javafx.scene.shape.Shape;
 import Model.Rating;
 import Model.Room;
@@ -21,6 +22,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -40,6 +42,20 @@ public class MainWindow extends Application {
 	public Pane root;
 	public StackPane holder;
 	public Canvas canvas;
+	public Visitor visitor;
+    public Visitor visitor1;
+    public Visitor visitor2;
+    public Visitor visitor3;
+    public Rectangle reception;
+    public Room room1;
+    public Room room2;
+    public Room room3;
+    public Room room4;
+    public Room room5;
+    public Room room6;
+    public Button buyFourthRoomButton;
+    public Button buyFifthRoomButton;
+    public Button buySixthRoomButton;
 	
 	public static void main(String[] args) 
     {
@@ -64,81 +80,108 @@ public class MainWindow extends Application {
         ratingLabel.setLayoutX(420);
         ratingLabel.setLayoutY(370);
         
-        Rectangle reception = new Rectangle(50,100,Color.SIENNA);
+        reception = new Rectangle(50,100,Color.SIENNA);
         reception.setX(470);
         reception.setY(200);
         
         Vector rooms = new Vector();
         
-        Room room1 = new Room(0,0,true,true);
+        room1 = new Room(0,0,true,true);
         rooms.add(room1);
-        Room room2 = new Room(100,0,true,true);
+        room2 = new Room(100,0,true,true);
         rooms.add(room2);
-        Room room3 = new Room(200,0,true,true);
+        room3 = new Room(200,0,true,true);
         rooms.add(room3);
-        Room room4 = new Room(300,0,false,true);
+        room4 = new Room(300,0,false,true);
         rooms.add(room4);
-        Room room5 = new Room(400,0,false,true);
+        room5 = new Room(400,0,false,true);
         rooms.add(room5);
-        Room room6 = new Room(500,0,false,true);
+        room6 = new Room(500,0,false,true);
         rooms.add(room6);
         
-        Button buyFourthRoomButton = new Button("Buy");
+        buyFourthRoomButton = new Button("Buy");
         buyFourthRoomButton.setLayoutX(335);
         buyFourthRoomButton.setLayoutY(50);
         
-        Button buyFifthRoomButton = new Button("Buy");
+        buyFifthRoomButton = new Button("Buy");
         buyFifthRoomButton.setLayoutX(435);
         buyFifthRoomButton.setLayoutY(50);
         
-        Button buySixthRoomButton = new Button("Buy");
+        buySixthRoomButton = new Button("Buy");
         buySixthRoomButton.setLayoutX(535);
         buySixthRoomButton.setLayoutY(50);
         
         Vector<Visitor> visitors = new Vector();
-        Visitor visitor = new Visitor();
-        Visitor visitor1 = new Visitor();
-        visitors.add(visitor1);
+        visitor = new Visitor();
+        visitor1 = new Visitor();
+        visitor2 = new Visitor();
+        visitor3 = new Visitor();
         visitors.add(visitor);
+        visitors.add(visitor1);
+        visitors.add(visitor3);
+        visitors.add(visitor2);
         
-        visitor.move(rooms, money);
+        
+        
         new Timer().scheduleAtFixedRate(new TimerTask() { 
         	int i = 0;
             public void run() {
-            	visitors.get(i).move(rooms, money);
-            	i++;
+            	if(i < 4) {
+            		visitors.get(i).move(rooms, money, root);
+            		if(i != rooms.size() - 1) {
+            			i++;
+            		}
+            	}
+            		
             }
-        }, 5000, 1);
+        }, 1000,7000);
         
        
         
         buyFourthRoomButton.setOnAction(e -> {
-        	if (money.money >= 150) {
-        		room4.isAvailable = true;
-        		money.money = money.money - 150;
-        		moneyLabel = new Label("Money: " + money.money + "$");
-        	}
-        	
-        	else {
-        		Alert alert = new Alert(AlertType.INFORMATION);
-        		alert.setTitle("This rom costs 150$");
-        		alert.setHeaderText("You can't buy this room");
-        		alert.setContentText("You don't have enough money!");
+        	Alert alert = new Alert(AlertType.CONFIRMATION);
+    		alert.setTitle("Confirmation Dialog");
+    		alert.setHeaderText("This room costs 150$");
+    		alert.setContentText("Are you sure you want to buy it?");
 
-        		alert.showAndWait();
-        	}
+    		Optional<ButtonType> result = alert.showAndWait();
+    		if (result.get() == ButtonType.OK){
+    			if (money.money >= 150) {
+            		room4.isAvailable = true;
+            		money.money = money.money - 150;
+            		moneyLabel = new Label("Money: " + money.money + "$");
+            		root.getChildren().remove(buyFourthRoomButton);
+            		root.getChildren().remove(room4.form);
+            		root.getChildren().remove(moneyLabel); 
+            		room4.form.setFill(Color.OLIVEDRAB);
+            		root.getChildren().addAll(moneyLabel, room4.form);
+            	}
+    			else {
+            		Alert alertRoom = new Alert(AlertType.INFORMATION);
+            		alert.setTitle("This rom costs 150$");
+            		alert.setHeaderText("You can't buy this room");
+            		alert.setContentText("You don't have enough money!");
+
+            		alert.showAndWait();
+            	}
+    		} else {
+    		}
+        	
         	
         });
-        
         holder.getChildren().addAll(canvas);
-        root.getChildren().addAll(holder, reception, room1.form, room2.form, room3.form, room4.form, room5.form, room6.form, buyFourthRoomButton, buySixthRoomButton, buyFifthRoomButton, moneyLabel, ratingLabel, visitor.form, visitor1.form);
-
+        root.getChildren().addAll(holder, reception, room1.form, room2.form, room3.form, room4.form, room5.form, room6.form, buyFourthRoomButton, buySixthRoomButton, buyFifthRoomButton, moneyLabel, ratingLabel, visitor.form, visitor1.form, visitor2.form, visitor3.form);
+        
         holder.setStyle("-fx-background-color: 	#FFF8DC");
         Scene scene = new Scene(root, 600, 400);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
     
-    public void refresh() {
+    public Pane refresh() {
+    	root = new Pane();
+    	root.getChildren().clear();
+    	root.getChildren().addAll(holder, reception, room1.form, room2.form, room3.form, room4.form, room5.form, room6.form, buyFourthRoomButton, buySixthRoomButton, buyFifthRoomButton, moneyLabel, ratingLabel, visitor.form, visitor1.form, visitor2.form, visitor3.form);
+    	return root;
     }
 }

@@ -66,7 +66,7 @@ public class Visitor {
 		return 8;
 	}
 	
-	public void askMessageAppear(Vector<Room> rooms, Money money) {
+	public void askMessageAppear(Vector<Room> rooms, Money money, Pane root) {
 		Circle cir = this.form;
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Look at me");
@@ -80,22 +80,28 @@ public class Visitor {
 			public void run() {
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == buttonYes){
-				   for(int i = 0; i < rooms.size(); i++) {
+				
+					for(int i = 0; i < rooms.size(); i++) {
 					   if (rooms.get(i).isAvailable && rooms.get(i).isFree) {
-						     double x = rooms.get(i).form.getLayoutX();
 					         double y = rooms.get(i).form.getLayoutY();
 					         TranslateTransition trans = new TranslateTransition();
-						     System.out.println(x);
-						     cir.setTranslateX(x+85);
+						     cir.setTranslateX(i*100+85);
 						     cir.setTranslateY(y-220);
 						     trans.setNode(cir);
 						     trans.play(); 
 						     rooms.get(i).isFree = false;
 						     money.money += 50;
+						     waitAndGoHome(rooms.get(i));
 						     return;
 					   }
-					   else {
-							
+					   else if (i == (rooms.size() - 1) && !rooms.get(i).isAvailable){
+							Alert alert = new Alert(AlertType.INFORMATION);
+							alert.setTitle("Information Dialog");
+							alert.setHeaderText(null);
+							alert.setContentText("Sorry! We don't have any free room for you");
+	
+							alert.showAndWait();
+
 							TranslateTransition trans = new TranslateTransition();
 					        trans.setDuration(Duration.seconds(10));
 					        trans.setToX(-10);
@@ -119,7 +125,7 @@ public class Visitor {
 		});
 	}
 	
-	public void move(Vector<Room> rooms, Money money) {
+	public void move(Vector<Room> rooms, Money money, Pane root) {
 		Circle cir = this.form;
 		TranslateTransition trans = new TranslateTransition();
 	    trans.setDuration(Duration.seconds(5));
@@ -132,9 +138,28 @@ public class Visitor {
 			@Override
 			public void handle(Event arg0) {
 				trans.stop();
-				askMessageAppear(rooms, money);
+				askMessageAppear(rooms, money, root);
 			}
 		});
 		
+	}
+	
+	public void waitAndGoHome(Room room) {
+		Circle cir = this.form;
+		
+	    PauseTransition pause = new PauseTransition(Duration.seconds(15));
+	    pause.setOnFinished(e -> {
+	    	TranslateTransition trans = new TranslateTransition();
+		    cir.setTranslateX(-100);
+		    cir.setTranslateY(220);
+		    trans.setNode(cir);
+		    trans.setDuration(Duration.seconds(3));
+		    room.isFree = true;
+	        trans.setToX(-10);
+	        trans.setToY(10);
+	    }
+	    
+	 );
+	    pause.play();
 	}
 }
