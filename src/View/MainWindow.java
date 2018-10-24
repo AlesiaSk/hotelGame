@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
+import Controller.Control;
 import Model.*;
 import javafx.scene.shape.Shape;
 import Model.Rating;
@@ -65,14 +66,14 @@ public class MainWindow extends Application {
     public void start(Stage primaryStage) 
     {
     	root = new Pane();
-
+    	Control controller = new Control();
         holder = new StackPane();
         canvas = new Canvas(600, 400);
         
         money = new Money();
         rating = new Rating();
         
-        moneyLabel = new Label("Money: " + money.money + "$");
+        moneyLabel = money.moneyLabel;
         moneyLabel.setLayoutX(500);
         moneyLabel.setLayoutY(370);
         
@@ -127,7 +128,7 @@ public class MainWindow extends Application {
         	int i = 0;
             public void run() {
             	if(i < 4) {
-            		visitors.get(i).move(rooms, money, root);
+            		visitors.get(i).move(rooms, money, root, rating);
             		if(i != rooms.size() - 1) {
             			i++;
             		}
@@ -151,14 +152,71 @@ public class MainWindow extends Application {
             		money.money = money.money - 150;
             		moneyLabel = new Label("Money: " + money.money + "$");
             		root.getChildren().remove(buyFourthRoomButton);
-            		root.getChildren().remove(room4.form);
-            		root.getChildren().remove(moneyLabel); 
-            		room4.form.setFill(Color.OLIVEDRAB);
-            		root.getChildren().addAll(moneyLabel, room4.form);
+            		room4.changeColor(root);
+            		controller.updateLabels(root, moneyLabel, ratingLabel);
             	}
     			else {
             		Alert alertRoom = new Alert(AlertType.INFORMATION);
             		alert.setTitle("This rom costs 150$");
+            		alert.setHeaderText("You can't buy this room");
+            		alert.setContentText("You don't have enough money!");
+
+            		alert.showAndWait();
+            	}
+    		} else {
+    		}
+        	
+        	
+        });
+        
+        buyFifthRoomButton.setOnAction(e -> {
+        	Alert alert = new Alert(AlertType.CONFIRMATION);
+    		alert.setTitle("Confirmation Dialog");
+    		alert.setHeaderText("This room costs 300$");
+    		alert.setContentText("Are you sure you want to buy it?");
+
+    		Optional<ButtonType> result = alert.showAndWait();
+    		if (result.get() == ButtonType.OK){
+    			if (money.money >= 300) {
+            		room5.isAvailable = true;
+            		money.money = money.money - 300;
+            		moneyLabel = new Label("Money: " + money.money + "$");
+            		root.getChildren().remove(buyFifthRoomButton);
+            		room5.changeColor(root);
+            		controller.updateLabels(root, moneyLabel, ratingLabel);
+            	}
+    			else {
+            		Alert alertRoom = new Alert(AlertType.INFORMATION);
+            		alert.setTitle("This rom costs 300$");
+            		alert.setHeaderText("You can't buy this room");
+            		alert.setContentText("You don't have enough money!");
+
+            		alert.showAndWait();
+            	}
+    		} else {
+    		}
+        	
+        	
+        });
+        
+        buySixthRoomButton.setOnAction(e -> {
+        	Alert alert = new Alert(AlertType.CONFIRMATION);
+    		alert.setTitle("Confirmation Dialog");
+    		alert.setHeaderText("This room costs 600$");
+    		alert.setContentText("Are you sure you want to buy it?");
+    		Optional<ButtonType> result = alert.showAndWait();
+    		if (result.get() == ButtonType.OK){
+    			if (money.money >= 600) {
+            		room6.isAvailable = true;
+            		money.money = money.money - 600;
+            		moneyLabel = new Label("Money: " + money.money + "$");
+            		root.getChildren().remove(buySixthRoomButton);
+            		room6.changeColor(root);
+            		controller.updateLabels(root, moneyLabel, ratingLabel);
+            	}
+    			else {
+            		Alert alertRoom = new Alert(AlertType.INFORMATION);
+            		alert.setTitle("This rom costs 600$");
             		alert.setHeaderText("You can't buy this room");
             		alert.setContentText("You don't have enough money!");
 
@@ -178,10 +236,7 @@ public class MainWindow extends Application {
         primaryStage.show();
     }
     
-    public Pane refresh() {
-    	root = new Pane();
-    	root.getChildren().clear();
-    	root.getChildren().addAll(holder, reception, room1.form, room2.form, room3.form, room4.form, room5.form, room6.form, buyFourthRoomButton, buySixthRoomButton, buyFifthRoomButton, moneyLabel, ratingLabel, visitor.form, visitor1.form, visitor2.form, visitor3.form);
-    	return root;
-    }
+    
+    
+
 }

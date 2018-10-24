@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.Pane;
 
 public class Room {
 
@@ -36,8 +37,24 @@ public class Room {
 		
 	}
 	
-	public void buyRoom() {
-		
+	public void changeColor(Pane root) {
+		if(this.isAvailable) {
+			if(this.isFree) {
+        		root.getChildren().remove(this.form);
+        		root.getChildren().addAll(this.form);
+				this.form.setFill(Color.OLIVEDRAB);
+			}
+			else {
+				root.getChildren().remove(this.form);
+        		root.getChildren().addAll(this.form);
+				this.form.setFill(Color.LIGHTCORAL);
+			}
+		}
+		else {
+			root.getChildren().remove(this.form);
+    		root.getChildren().addAll(this.form);
+			this.form.setFill(Color.LIGHTSTEELBLUE);
+		}
 	}
 	
 }

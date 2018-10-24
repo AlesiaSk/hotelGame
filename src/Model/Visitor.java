@@ -3,6 +3,7 @@ package Model;
 import java.util.Random;
 import java.util.Vector;
 
+import Controller.Control;
 import View.MainWindow;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -66,7 +67,7 @@ public class Visitor {
 		return 8;
 	}
 	
-	public void askMessageAppear(Vector<Room> rooms, Money money, Pane root) {
+	public void askMessageAppear(Vector<Room> rooms, Money money, Pane root, Rating rate) {
 		Circle cir = this.form;
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Look at me");
@@ -75,6 +76,7 @@ public class Visitor {
 		ButtonType buttonYes = new ButtonType("Yes");
 		ButtonType buttonNo = new ButtonType("No");
 		MainWindow window = new MainWindow();
+		Control controller = new Control();
 		alert.getButtonTypes().setAll(buttonYes, buttonNo);
 		Platform.runLater(new Runnable() {
 			public void run() {
@@ -90,8 +92,13 @@ public class Visitor {
 						     trans.setNode(cir);
 						     trans.play(); 
 						     rooms.get(i).isFree = false;
+						     rooms.get(i).changeColor(root);
+						     cir.toFront();
 						     money.money += 50;
-						     waitAndGoHome(rooms.get(i));
+						     rate.rating = rate.rating + 0.2;
+						     controller.isWin(rate);
+						     controller.isLose(rate);
+						     waitAndGoHome(rooms.get(i), root);
 						     return;
 					   }
 					   else if (i == (rooms.size() - 1) && !rooms.get(i).isAvailable){
@@ -101,7 +108,9 @@ public class Visitor {
 							alert.setContentText("Sorry! We don't have any free room for you");
 	
 							alert.showAndWait();
-
+							rate.rating = rate.rating - 1;
+							controller.isWin(rate);
+						    controller.isLose(rate);
 							TranslateTransition trans = new TranslateTransition();
 					        trans.setDuration(Duration.seconds(10));
 					        trans.setToX(-10);
@@ -112,20 +121,22 @@ public class Visitor {
 						}
 				   }
 			} else {
-				
+				rate.rating = rate.rating - 1;
 				TranslateTransition trans = new TranslateTransition();
 		        trans.setDuration(Duration.seconds(10));
 		        trans.setToX(-10);
 		        trans.setToY(10);
 		        trans.setNode(cir);
 		        trans.play();
+		        controller.isWin(rate);
+			    controller.isLose(rate);
 		        return;
 			}
 			}  
 		});
 	}
 	
-	public void move(Vector<Room> rooms, Money money, Pane root) {
+	public void move(Vector<Room> rooms, Money money, Pane root, Rating rate) {
 		Circle cir = this.form;
 		TranslateTransition trans = new TranslateTransition();
 	    trans.setDuration(Duration.seconds(5));
@@ -138,16 +149,16 @@ public class Visitor {
 			@Override
 			public void handle(Event arg0) {
 				trans.stop();
-				askMessageAppear(rooms, money, root);
+				askMessageAppear(rooms, money, root, rate);
 			}
 		});
 		
 	}
 	
-	public void waitAndGoHome(Room room) {
+	public void waitAndGoHome(Room room, Pane root) {
 		Circle cir = this.form;
 		
-	    PauseTransition pause = new PauseTransition(Duration.seconds(15));
+	    PauseTransition pause = new PauseTransition(Duration.seconds(10));
 	    pause.setOnFinished(e -> {
 	    	TranslateTransition trans = new TranslateTransition();
 		    cir.setTranslateX(-100);
@@ -155,6 +166,8 @@ public class Visitor {
 		    trans.setNode(cir);
 		    trans.setDuration(Duration.seconds(3));
 		    room.isFree = true;
+		    room.changeColor(root);
+		    cir.toFront();
 	        trans.setToX(-10);
 	        trans.setToY(10);
 	    }
