@@ -47,6 +47,10 @@ public class MainWindow extends Application {
     public Visitor visitor1;
     public Visitor visitor2;
     public Visitor visitor3;
+    public Visitor visitor4;
+    public Visitor visitor5;
+    public Visitor visitor6;
+    public Visitor visitor7;
     public Rectangle reception;
     public Room room1;
     public Room room2;
@@ -54,6 +58,7 @@ public class MainWindow extends Application {
     public Room room4;
     public Room room5;
     public Room room6;
+    Puddle puddle;
     public Button buyFourthRoomButton;
     public Button buyFifthRoomButton;
     public Button buySixthRoomButton;
@@ -117,25 +122,43 @@ public class MainWindow extends Application {
         visitor1 = new Visitor();
         visitor2 = new Visitor();
         visitor3 = new Visitor();
+        visitor4 = new Visitor();
+        visitor5 = new Visitor();
+        visitor6 = new Visitor();
+        visitor7 = new Visitor();
+        puddle = new Puddle();
+        
         visitors.add(visitor);
         visitors.add(visitor1);
         visitors.add(visitor3);
         visitors.add(visitor2);
-        
-        
+        visitors.add(visitor4);
+        visitors.add(visitor5);
+        visitors.add(visitor6);
+        visitors.add(visitor7);
         
         new Timer().scheduleAtFixedRate(new TimerTask() { 
         	int i = 0;
+        	int time = 0;
             public void run() {
-            	if(i < 4) {
-            		visitors.get(i).move(rooms, money, root, rating);
-            		if(i != rooms.size() - 1) {
-            			i++;
-            		}
+            	if(i < 8) {
+            		visitors.get(i).move(rooms, money, root, rating, time);
+            		i++;
+            		time++;
+            		
+            	}
+            	else {
+            		i = 0;
+            	}
+            	
+            	if(time % 10 == 0) {
+            		root.getChildren().remove(puddle.form);
+            		puddle.appear();
+            		root.getChildren().add(puddle.form);
             	}
             		
             }
-        }, 1000,7000);
+        }, 0,5000);
         
        
         
@@ -228,7 +251,7 @@ public class MainWindow extends Application {
         	
         });
         holder.getChildren().addAll(canvas);
-        root.getChildren().addAll(holder, reception, room1.form, room2.form, room3.form, room4.form, room5.form, room6.form, buyFourthRoomButton, buySixthRoomButton, buyFifthRoomButton, moneyLabel, ratingLabel, visitor.form, visitor1.form, visitor2.form, visitor3.form);
+        root.getChildren().addAll(holder, reception, room1.form, room1.lamp.form, room2.form, room2.lamp.form, room3.form, room3.lamp.form, room4.form, room4.lamp.form, room5.form, room5.lamp.form, room6.form, room6.lamp.form, buyFourthRoomButton, buySixthRoomButton, buyFifthRoomButton, moneyLabel, ratingLabel, visitor.form, visitor1.form, visitor2.form, visitor3.form, visitor4.form, visitor5.form, visitor6.form, visitor7.form, puddle.form);
         
         holder.setStyle("-fx-background-color: 	#FFF8DC");
         Scene scene = new Scene(root, 600, 400);

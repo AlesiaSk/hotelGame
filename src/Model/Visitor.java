@@ -46,28 +46,8 @@ public class Visitor {
         return Color.rgb(r, g, b);
     }
 	
-	public int numberOfVisitors(int time) {
-		Random r = new Random();
-		
-		if(time < 1) {
-			return r.nextInt((3 - 1) + 1) + 1;
-		}
-		else if (time > 1 && time < 2) {
-			return r.nextInt((4 - 2) + 1) + 2;
-		}
-		else if (time >= 2 && time < 3) {
-			return r.nextInt((5 - 3) + 1) + 3;
-		}
-		else if (time >= 3 && time < 4) {
-			return r.nextInt((6 - 4) + 1) + 4;
-		}
-		else if (time >= 4 && time < 5) {
-			return r.nextInt((7 - 5) + 1) + 5;
-		}
-		return 8;
-	}
 	
-	public void askMessageAppear(Vector<Room> rooms, Money money, Pane root, Rating rate) {
+	public void askMessageAppear(Vector<Room> rooms, Money money, Pane root, Rating rate, int time) {
 		Circle cir = this.form;
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Look at me");
@@ -95,10 +75,10 @@ public class Visitor {
 						     rooms.get(i).changeColor(root);
 						     cir.toFront();
 						     money.money += 50;
-						     rate.rating = rate.rating + 0.2;
+						     rate.rating = rate.rating + 0.1;
 						     controller.isWin(rate);
 						     controller.isLose(rate);
-						     waitAndGoHome(rooms.get(i), root);
+						     waitAndGoHome(rooms.get(i), root, time);
 						     return;
 					   }
 					   else if (i == (rooms.size() - 1) && !rooms.get(i).isAvailable){
@@ -136,7 +116,7 @@ public class Visitor {
 		});
 	}
 	
-	public void move(Vector<Room> rooms, Money money, Pane root, Rating rate) {
+	public void move(Vector<Room> rooms, Money money, Pane root, Rating rate, int time) {
 		Circle cir = this.form;
 		TranslateTransition trans = new TranslateTransition();
 	    trans.setDuration(Duration.seconds(5));
@@ -149,27 +129,26 @@ public class Visitor {
 			@Override
 			public void handle(Event arg0) {
 				trans.stop();
-				askMessageAppear(rooms, money, root, rate);
+				askMessageAppear(rooms, money, root, rate, time);
 			}
 		});
 		
 	}
 	
-	public void waitAndGoHome(Room room, Pane root) {
+	public void waitAndGoHome(Room room, Pane root, int time) {
 		Circle cir = this.form;
 		
-	    PauseTransition pause = new PauseTransition(Duration.seconds(10));
+	    PauseTransition pause = new PauseTransition(Duration.seconds(15 + time));
+		
 	    pause.setOnFinished(e -> {
 	    	TranslateTransition trans = new TranslateTransition();
-		    cir.setTranslateX(-100);
-		    cir.setTranslateY(220);
+	    	cir.setTranslateX(-10);
+		    cir.setTranslateY(120);
 		    trans.setNode(cir);
 		    trans.setDuration(Duration.seconds(3));
 		    room.isFree = true;
 		    room.changeColor(root);
 		    cir.toFront();
-	        trans.setToX(-10);
-	        trans.setToY(10);
 	    }
 	    
 	 );
